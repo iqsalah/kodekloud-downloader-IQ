@@ -19,9 +19,7 @@ from kodekloud_downloader.models import Topic
 
 import yt_dlp  # isort: skip
 
-
 logger = logging.getLogger(__name__)
-
 
 def download_course(
     url: str,
@@ -61,6 +59,11 @@ def download_course(
     downloaded_videos = defaultdict(int)
     for i, item in enumerate(items, start=1):
         for j, lesson in enumerate(item.lessons, start=1):
+            # Skip the problematic URL
+            if lesson.url == "https://kodekloud.com/topic/configure-the-system-to-use-ldap-user-and-group-accounts%e2%9c%a8/":
+                logger.warning("Skipping unsupported URL:", lesson.url)
+                continue  # Skip this URL and continue to the next one
+
             file_path = create_file_path(
                 output_dir, course_name, i, item.name, j, lesson.name
             )
@@ -72,7 +75,7 @@ def download_course(
                     and downloaded_videos[current_video_url] > max_duplicate_count
                 ):
                     raise SystemExit(
-                        f"The folowing video is downloaded more than {max_duplicate_count}."
+                        f"The following video is downloaded more than {max_duplicate_count}."
                         "\nYour cookie might have expired or you don't have access/enrolled to the course."
                         "\nPlease refresh/regenerate the cookie or enroll in the course and try again."
                     )
@@ -80,7 +83,6 @@ def download_course(
                 downloaded_videos[current_video_url] += 1
             else:
                 download_resource_lesson(lesson, file_path, cookie)
-
 
 def create_file_path(
     output_dir: Union[str, Path],
@@ -109,7 +111,6 @@ def create_file_path(
         / f"{j} - {normalize_name(lesson_name)}"
     )
 
-
 def download_video_lesson(lesson, file_path: Path, cookie: str, quality: str) -> None:
     """
     Download a video lesson.
@@ -120,36 +121,6 @@ def download_video_lesson(lesson, file_path: Path, cookie: str, quality: str) ->
     :param quality: The video quality (e.g. "720p")
     """
     logger.info(f"Writing video file... {file_path}...")
-    # Assuming `items` is defined elsewhere in your code
-for i, item in enumerate(item, start=1):
-    for j, lesson in enumerate(item.lessons, start=1):
-        # Add this condition to skip the problematic URL
-        if lesson.url == "https://kodekloud.com/topic/configure-the-system-to-use-ldap-user-and-group-accounts%e2%9c%a8/":
-            logger.warning("Skipping unsupported URL:", lesson.url)
-            continue  # Skip this URL and continue to the next one
-
-        file_path = create_file_path(
-            output_dir, course_name, i, item.name, j, lesson.name
-        )
-
-        if lesson.is_video:
-            current_video_url = get_video_info(lesson.url, cookie=cookie).get("url")
-            if (
-                current_video_url in downloaded_videos
-                and downloaded_videos[current_video_url] > max_duplicate_count
-            ):
-                raise SystemExit(
-                    f"The following video is downloaded more than {max_duplicate_count}."
-                    "\nYour cookie might have expired or you don't have access/enrolled to the course."
-                    "\nPlease refresh/regenerate the cookie or enroll in the course and try again."
-                )
-            download_video_lesson(lesson, file_path, cookie, quality)
-            downloaded_videos[current_video_url] += 1
-        else:
-            download_resource_lesson(lesson, file_path, cookie)
-
-
-
     file_path.parent.mkdir(parents=True, exist_ok=True)
     logger.info(f"Parsing url: {lesson.url}")
     try:
@@ -168,7 +139,6 @@ for i, item in enumerate(item, start=1):
         logger.error(
             f"Access denied while downloading video or audio file from link {lesson.url}"
         )
-
 
 def download_resource_lesson(lesson, file_path: Path, cookie: str) -> None:
     """
