@@ -121,7 +121,7 @@ def download_video_lesson(lesson, file_path: Path, cookie: str, quality: str) ->
     """
     logger.info(f"Writing video file... {file_path}...")
     # Assuming `items` is defined elsewhere in your code
-for i, item in enumerate(items, start=1):
+for i, item in enumerate(item, start=1):
     for j, lesson in enumerate(item.lessons, start=1):
         # Add this condition to skip the problematic URL
         if lesson.url == "https://kodekloud.com/topic/configure-the-system-to-use-ldap-user-and-group-accounts%e2%9c%a8/":
