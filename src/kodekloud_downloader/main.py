@@ -144,8 +144,8 @@ def download_video_lesson(lesson, file_path: Path, cookie: str, quality: str) ->
                 )
             download_video_lesson(lesson, file_path, cookie, quality)
             downloaded_videos[current_video_url] += 1
-        else:
-            download_resource_lesson(lesson, file_path, cookie)
+            else:
+                download_resource_lesson(lesson, file_path, cookie)
 
     file_path.parent.mkdir(parents=True, exist_ok=True)
     logger.info(f"Parsing url: {lesson.url}")
